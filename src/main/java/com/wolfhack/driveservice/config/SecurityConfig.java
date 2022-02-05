@@ -30,9 +30,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http.csrf().disable();
         http.sessionManagement().sessionCreationPolicy(STATELESS);
-        http.authorizeRequests().antMatchers("/api/user/save", "/login", "/api/token/refresh/**").permitAll();
-        http.authorizeRequests().antMatchers(GET, "/api/user/**").hasAuthority("ROLE_USER");
-        http.authorizeRequests().antMatchers(POST, "/api/role/**").hasAuthority("ROLE_ADMIN");
+        http.authorizeRequests().antMatchers( "/login", "/api/token/refresh/**").permitAll();
+        http.authorizeRequests().antMatchers("/api/user/**").hasAuthority("ROLE_USER");
+        http.authorizeRequests().antMatchers(POST, "/api/user/role").hasAuthority("ROLE_ADMIN");
+        http.authorizeRequests().antMatchers(GET, "/api/users").hasAuthority("ROLE_ADMIN");
         http.authorizeRequests().anyRequest().authenticated();
         http.addFilter(new CustomAuthenticationFilter(authenticationManagerBean()));
         http.addFilterBefore(new CustomAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);

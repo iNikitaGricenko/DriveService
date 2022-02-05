@@ -6,6 +6,7 @@ import com.wolfhack.driveservice.repository.RoleRepository;
 import com.wolfhack.driveservice.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.ObjectNotFoundException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -30,12 +31,9 @@ public class UserService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String login) throws UsernameNotFoundException {
-        User user = userRepository.findByPhone(login);
-        CustomUserDetails userDetails = null;
-        if (Objects.isNull(user)) {
-            throw new UsernameNotFoundException(String.format("User %s is not found", login));
-        }
-        userDetails = new CustomUserDetails();
+        User user = userRepository.findByPhone(login)
+                .orElseThrow(() -> new UsernameNotFoundException("User with that login not found"));
+        CustomUserDetails userDetails = new CustomUserDetails();
         userDetails.setUser(user);
 
         return userDetails;
@@ -43,7 +41,8 @@ public class UserService implements UserDetailsService {
 
     public User add(User user) {
         if (userRepository.existsByPhone(user.getPhone())) {
-            return userRepository.findByPhone(user.getPhone());
+            return userRepository.findByPhone(user.getPhone())
+                    .orElseThrow(() -> new ObjectNotFoundException(user.getPhone(), user.getFirstName()));
         }
         user.setPassword(passwordEncoder.encode(user.getPassword()));
 
@@ -57,7 +56,8 @@ public class UserService implements UserDetailsService {
     }
 
     public User get(String phone) {
-        return userRepository.findByPhone(phone);
+        return userRepository.findByPhone(phone)
+                .orElseThrow();
     }
 
     public User get(Long id) throws NotFoundException {
@@ -72,7 +72,7 @@ public class UserService implements UserDetailsService {
         String userPhone = user.getPhone();
         String userPassword = user.getPassword();
 
-        User existedUser = userRepository.findByPhone(userPhone);
+        User existedUser = userRepository.findByPhone(userPhone).orElseThrow();
         String existedUserPassword = existedUser.getPassword();
 
         return existedUserPassword.equals(userPassword);
