@@ -21,40 +21,6 @@ public class DriveServiceApplication {
     }
 
     @Bean
-    CommandLineRunner run(UserService userService) {
-        return args -> {
-            User user = new User();
-            user.setId(1L);
-            user.setPhone("380680695374");
-            user.setPassword("OneDarkWolf10");
-
-            user.setCity("Zaporizhzhya");
-            user.setFirstName("Nikita");
-            user.setLastName("Gritsenko");
-            user.setSurname("Evgenevich");
-
-            Set<Role> roles = new HashSet<>();
-
-            Role role = new Role();
-            role.setId(1L);
-            role.setName("ADMIN");
-
-            userService.addRole(role);
-            roles.add(role);
-
-            role.setId(2L);
-            role.setName("USER");
-
-            userService.addRole(role);
-            roles.add(role);
-
-            user.setRoles(roles);
-
-            userService.add(user);
-        };
-    }
-
-    @Bean
     PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
